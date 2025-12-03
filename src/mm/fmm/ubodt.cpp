@@ -72,6 +72,7 @@ Record* UBODT::look_up_or_make(NETWORK::NodeIndex source,
 
 		std::stack<NodeIndex> route;
 
+    int i = 1e5;
 		for (auto iter = pmap.begin(); iter != pmap.end(); ++iter) {
 			NodeIndex cur_node = iter->first;
 			if (!Q.contain_node(cur_node) && !look_up(source, cur_node)) {
@@ -87,6 +88,11 @@ Record* UBODT::look_up_or_make(NETWORK::NodeIndex source,
 				// The former is always the source
 				NodeIndex former = source;
 				while(former != cur_node && !look_up(former, cur_node)) {
+          if (i-- <= 0) {
+            SPDLOG_WARN("Dijkstra result storing took too long");
+            break;
+          }
+
 					// Repeat until the route reached cur_node
 					// or the rest of the route is already in the table
 
@@ -105,6 +111,10 @@ Record* UBODT::look_up_or_make(NETWORK::NodeIndex source,
 					r->next = nullptr;
 					insert(r);
 				}
+
+        if (i <= 0) {
+          break;
+        }
 			}
 		}
 		r = look_up(source, target);
