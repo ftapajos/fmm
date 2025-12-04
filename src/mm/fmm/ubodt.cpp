@@ -652,6 +652,12 @@ std::vector<std::vector<NETWORK::EdgeIndex>> UBODT::look_k_sp_path(
 						try {
 							auto newCandidate = getMinimalPathAfterEdge(edge.second, lastSource, candidateBasePath);
 							route_candidates.push(newCandidate);
+
+              if(route_candidates.size() >= 1e7) {
+                SPDLOG_WARN("route_candidates is too large ({}). Giving up after k={}", route_candidates.size(), k);
+                route_candidates.clear();
+                break;
+              }
 						} catch (std::invalid_argument const& ex) {
 							continue;
 						}
